@@ -29,12 +29,11 @@ public class UserDaoHibernateImpl extends Util implements UserDao {
                     "name VARCHAR(50) NOT NULL, lastName VARCHAR(50) NOT NULL, " +
                     "age TINYINT NOT NULL)").addEntity(User.class);
             query.executeUpdate();
-
+            transaction.commit();
         }catch (Exception e) {
             transaction.rollback();
             logger.info("Не удалось создать таблицу!");
         } finally {
-            transaction.commit();
             session.close();
         }
 
@@ -48,11 +47,11 @@ public class UserDaoHibernateImpl extends Util implements UserDao {
         try {
             Query query = session.createSQLQuery("DROP TABLE IF EXISTS users").addEntity(User.class);
             query.executeUpdate();
+            transaction.commit();
         }catch (Exception e){
             transaction.rollback();
             logger.info("Не удалось очистить пользователей!");
         }finally {
-            transaction.commit();
             session.close();
         }
 
@@ -66,12 +65,11 @@ public class UserDaoHibernateImpl extends Util implements UserDao {
         try {
             session.save(new User(name, lastName, age));
             logger.info("User " + " " + name + " " + "добавлен в базу!");
-
+            transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
             logger.info("Не удалось сохранить пользователя!");
         } finally {
-            transaction.commit();
             session.close();
         }
 
@@ -85,15 +83,16 @@ public class UserDaoHibernateImpl extends Util implements UserDao {
         try {
             User user = (User)session.load(User.class, id);
             session.delete(user);
+            transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
             logger.info("Ошибка при удалении пользователя!");
         } finally {
-            transaction.commit();
             session.close();
         }
 
     }
+
 
     @Override
     public List<User> getAllUsers() {
@@ -103,16 +102,17 @@ public class UserDaoHibernateImpl extends Util implements UserDao {
         try {
             list= session.createQuery("FROM " +User.class.getSimpleName()).list();
             logger.info(list.toString());
+            transaction.commit();
             return list;
         } catch (Exception e) {
             transaction.rollback();
             logger.info("Ошибка при получении всех пользователей!");
         } finally {
-            transaction.commit();
             session.close();
         }
         return list;
     }
+    //Query
 
     @Override
     public void cleanUsersTable() {
@@ -124,11 +124,11 @@ public class UserDaoHibernateImpl extends Util implements UserDao {
             for (User user : list) {
                 session.delete(user);
             }
+            transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
             logger.info("Не удалось очистить таблицу!");
         } finally {
-            transaction.commit();
             session.close();
         }
     }
